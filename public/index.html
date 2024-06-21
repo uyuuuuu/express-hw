@@ -8,7 +8,7 @@
       .chat {
         display: flex;
         flex-direction: column;
-        height: 50vh;
+        height: 100vh;
       }
       .messages {
         flex: 1;
@@ -44,47 +44,40 @@
 
     <script>
       function main() {
-        const host = location.origin.replace(/^http/, "ws");
-        const ws = new WebSocket(host + "/ws");
+        const host = location.origin.replace(/^http/, 'ws')
+        const ws = new WebSocket(host + '/ws')
+        const myId = self.crypto.randomUUID().substr(0, 8)
 
-        const form = document.querySelector(".form");
-        const myId = self.crypto.randomUUID().substr(0, 8);
+        const form = document.querySelector('.form')
 
         form.onsubmit = function (e) {
-          e.preventDefault();
-          const input = document.querySelector(".input");
-          const text = input.value;
-
-          const msg = {
-            id: myId,
-            text: text,
-          };
-
-          ws.send(JSON.stringify(msg));
-          input.value = "";
-          input.focus();
-        };
+          e.preventDefault()
+          const input = document.querySelector('.input')
+          const text = input.value
+          ws.send(JSON.stringify({ id: myId, text }))
+          input.value = ''
+          input.focus()
+        }
 
         ws.onmessage = function (msg) {
-          const response = msg.data;
-          const res = JSON.parse(msg.data);
-
-          const messageList = document.querySelector(".messages");
-          const li = document.createElement("li");
-          if (res.id === myId) {
-            li.textContent = `(${res.id})自分:` + res.text;
+          const response = msg.data
+          const { id, text } = JSON.parse(msg.data)
+           const messageList = document.querySelector('.messages')
+           const li = document.createElement('li')
+          if (id === myId) {
+            li.textContent = `(${id})自分:` + text
           } else {
-            li.textContent = res.id + ": " + res.text;
+            li.textContent = id + ': ' + text
           }
-          messageList.appendChild(li);
-        };
+           messageList.appendChild(li)
+        }
 
         ws.onerror = function (error) {
-          console.error("WebSocket Error: ", error);
-        };
+          console.error('WebSocket Error: ', error)
+        }
       }
 
-      main();
+      main()
     </script>
   </body>
 </html>
